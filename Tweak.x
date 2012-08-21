@@ -223,11 +223,11 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 		if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) {
 			[*_titleLabel setHidden:NO];
 			CGSize firstLabelSize = [*_titleLabel sizeThatFits:bounds.size];
-			[*_titleLabel setFrame:(CGRect){ { width + 5.0f, 0.0f }, { firstLabelSize.width, 19.0f } }];
-			[*_messageLabel setFrame:(CGRect){ { firstLabelSize.width + width + 7.0f, 1.5f }, { bounds.size.width - firstLabelSize.width - width - 8.0f, 19.0f } }];
+			[*_titleLabel setFrame:(CGRect){ { width + 6.0f, 0.0f }, { firstLabelSize.width, 19.0f } }];
+			[*_messageLabel setFrame:(CGRect){ { firstLabelSize.width + width + 8.0f, 1.5f }, { bounds.size.width - firstLabelSize.width - width - 8.0f, 19.0f } }];
 		} else {
 			[*_titleLabel setHidden:YES];
-			[*_messageLabel setFrame:(CGRect){ { width + 5.0f, 1.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
+			[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 1.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
 		}
 		if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
 			[*_messageLabel setMarqueeEnabled:YES];
