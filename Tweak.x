@@ -113,6 +113,15 @@
 - (UIImage *)_bannerImageWithAttachmentImage:(UIImage *)attachmentImage;
 @end
 
+@interface SBBannerAndShadowView : NSObject
+
+-(SBBannerView*) banner;
+
+@end
+
+@interface SBBulletinBannerController : NSObject
+@end
+
 @interface UILabel (Marquee)
 - (void)setMarqueeEnabled:(BOOL)marqueeEnabled;
 - (void)setMarqueeRunning:(BOOL)marqueeRunning;
@@ -121,6 +130,31 @@
 %config(generator=internal);
 
 %hook SBBulletinBannerController
+
+static NSTimeInterval dismissInterval(SBBulletinBannerController* ctr, SEL selector, NSTimeInterval delay)
+{
+	NSString* selStr = NSStringFromSelector(selector);
+	if ([selStr isEqualToString:@"_dismissIntervalElapsed"])
+	{
+		SBBannerAndShadowView** _bannerAndShadowView = CHIvarRef(ctr, _bannerAndShadowView, SBBannerAndShadowView*);
+		SBBannerView* banner = [*_bannerAndShadowView banner];
+
+		UILabel** _messageLabel = CHIvarRef(banner, _messageLabel, UILabel*);
+		NSString* text = [*_messageLabel text];
+		CGSize size = [text sizeWithFont:[*_messageLabel font]];
+		float distance = size.width - [*_messageLabel frame].size.width;
+		if (distance > 0)
+			return (distance / 30.0f) + 2.0f;
+	}
+
+	return delay;
+}
+
+-(void) performSelector:(SEL) selector withObject:(id) obj afterDelay:(NSTimeInterval) delay inModes:(NSArray*) modes
+{
+	delay = dismissInterval(self, selector, delay);
+	%orig;
+}
 
 - (CGRect)_currentBannerFrameForOrientation:(int)orientation
 {
@@ -187,6 +221,13 @@ static int statusBarStyle()
 static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 {
 	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist"];
+
+	id smart = [settings objectForKey:@"DBSmartTitles"];
+	if ([smart boolValue])
+	{
+		return ([displayIdentifier rangeOfString:@"com.apple."].location == 0);
+	}
+
 	NSString *key = [NSString stringWithFormat:@"DBShowTitle-%@", displayIdentifier];
 	id value = [settings objectForKey:key];
 	return !value || [value boolValue];
@@ -220,15 +261,15 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 				break;
 		}
 
-		if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) {
-			[*_titleLabel setHidden:NO];
-			CGSize firstLabelSize = [*_titleLabel sizeThatFits:bounds.size];
-			[*_titleLabel setFrame:(CGRect){ { width + 6.0f, 0.0f }, { firstLabelSize.width, 19.0f } }];
-			[*_messageLabel setFrame:(CGRect){ { firstLabelSize.width + width + 8.0f, 1.5f }, { bounds.size.width - firstLabelSize.width - width - 8.0f, 19.0f } }];
-		} else {
-			[*_titleLabel setHidden:YES];
-			[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 1.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
+		if (![*_titleLabel isHidden])
+		{
+			if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) 
+				[*_messageLabel setText:[NSString stringWithFormat:@"%@: %@", [*_titleLabel text], [*_messageLabel text]]];
 		}
+
+		[*_titleLabel setHidden:YES];
+		[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 1.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
+
 		if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
 			[*_messageLabel setMarqueeEnabled:YES];
 			[*_messageLabel setMarqueeRunning:YES];

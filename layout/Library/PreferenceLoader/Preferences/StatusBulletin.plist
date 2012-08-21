@@ -10,7 +10,14 @@ entry = {
   ALSettingsDefaultValue = 1;
   ALSectionDescriptors = (
     {
-      items = ();
+      items = (
+	{
+		cell = PSSwitchCell;
+		label = "Smart Titles";
+		key = "DBSmartTitles";
+		default = false;
+		defaults = "com.rpetrich.dietbulletin";
+	});
       "footer-title" = "Select which apps show titles in their bulletins";
     },
   	{
