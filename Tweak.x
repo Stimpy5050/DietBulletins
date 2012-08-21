@@ -2,6 +2,24 @@
 #import <CaptainHook/CaptainHook.h>
 #import <QuartzCore/QuartzCore.h>
 
+@interface UIImage (SBBKit)
+
++(UIImage*) kitImageNamed:(NSString*) name;
+
+@end
+
+@interface SBApplication : NSObject
+
+-(int) statusBarStyle;
+
+@end
+
+@interface SpringBoard : UIApplication
+
+-(SBApplication*) _accessibilityFrontMostApplication;
+
+@end
+
 @class BBAction, BBObserver, BBAssertion, BBAttachments, BBSound, BBContent;
 
 @interface BBBulletin : NSObject <NSCopying, NSCoding>
@@ -130,18 +148,33 @@
 
 %end
 
+static int statusBarStyle()
+{
+	SpringBoard* sb = (SpringBoard*)[UIApplication sharedApplication];
+	SBApplication* app = [sb _accessibilityFrontMostApplication];
+	return (app ? app.statusBarStyle : sb.statusBarStyle);
+}
+
 %hook SBBannerView
 
 - (SBBannerView*)initWithItem:(id)item
 {
-	if ((self = %orig())) {
-		[self setBackgroundColor:[UIColor blackColor]];
+	if ((self = %orig())) 
+	{
 		[self setClipsToBounds:YES];
-/*
-		CALayer *layer = [self layer];
-		[layer setCornerRadius:3.5f];
-		[layer setContents:(id)[UIImage imageNamed:@"BannerGradientMiddle"].CGImage];
-*/
+
+		CALayer* layer = self.layer;
+		switch (statusBarStyle())
+		{
+			case 0:
+				[self setBackgroundColor:[UIColor blackColor]];
+				layer.contents = (id)[UIImage kitImageNamed:@"Silver_Base.png"].CGImage;
+				break;
+			default:
+				[self setBackgroundColor:[UIColor blackColor]];
+				layer.contents = (id)[UIImage kitImageNamed:@"Black_Base.png"].CGImage;
+				break;
+		}
 	}
 	return self;
 }
@@ -167,11 +200,25 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 	UILabel **_messageLabel = CHIvarRef(self, _messageLabel, UILabel *);
 	UIView **_underlayView = CHIvarRef(self, _underlayView, UIView *);
 	if (_iconView && _titleLabel && _messageLabel && _underlayView) {
-		float width = 18.0f;
-		[*_iconView setFrame:(CGRect){ { 0.0f, (20.0f - width) / 2 }, { width, width } }];
+		float width = 16.0f;
+		[*_iconView setFrame:(CGRect){ { 1.0f, 2.0f }, { width, width } }];
 		CGRect bounds = [self bounds];
-		[*_titleLabel setTextColor:[UIColor whiteColor]];
-		[*_messageLabel setTextColor:[UIColor whiteColor]];
+
+		switch (statusBarStyle())
+		{
+			case 0:
+				[*_titleLabel setTextColor:[UIColor blackColor]];
+				[*_messageLabel setTextColor:[UIColor blackColor]];
+				break;
+			case 1:
+				[*_titleLabel setTextColor:[UIColor whiteColor]];
+				[*_messageLabel setTextColor:[UIColor whiteColor]];
+				break;
+			default:
+				[*_titleLabel setTextColor:[UIColor whiteColor]];
+				[*_messageLabel setTextColor:[UIColor whiteColor]];
+				break;
+		}
 
 		if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) {
 			[*_titleLabel setHidden:NO];
