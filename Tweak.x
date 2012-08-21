@@ -107,7 +107,7 @@
 - (CGRect)_currentBannerFrameForOrientation:(int)orientation
 {
 	CGRect result = %orig();
-	result.size.height -= 18.0f;
+	result.size.height -= 20.0f;
 	return result;
 }
 
@@ -117,14 +117,14 @@
 
 - (void)setBannerFrame:(CGRect)frame
 {
-	frame.size.height = 22.0f;
+	frame.size.height = 20.0f;
 	%orig();
 }
 
 - (CGRect)_frameForBannerFrame:(CGRect)bannerFrame
 {
 	CGRect result = %orig();
-	result.size.height -= 18.0f;
+	result.size.height -= 20.0f;
 	return result;
 }
 
@@ -132,13 +132,16 @@
 
 %hook SBBannerView
 
-- (id)initWithItem:(id)item
+- (SBBannerView*)initWithItem:(id)item
 {
 	if ((self = %orig())) {
-		[self setBackgroundColor:[UIColor whiteColor]];
+		[self setBackgroundColor:[UIColor blackColor]];
+		[self setClipsToBounds:YES];
+/*
 		CALayer *layer = [self layer];
 		[layer setCornerRadius:3.5f];
 		[layer setContents:(id)[UIImage imageNamed:@"BannerGradientMiddle"].CGImage];
+*/
 	}
 	return self;
 }
@@ -164,16 +167,20 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 	UILabel **_messageLabel = CHIvarRef(self, _messageLabel, UILabel *);
 	UIView **_underlayView = CHIvarRef(self, _underlayView, UIView *);
 	if (_iconView && _titleLabel && _messageLabel && _underlayView) {
-		[*_iconView setFrame:(CGRect){ { 1.0f, 1.0f }, { 20.0f, 20.0f, } }];
+		float width = 18.0f;
+		[*_iconView setFrame:(CGRect){ { 0.0f, (20.0f - width) / 2 }, { width, width } }];
 		CGRect bounds = [self bounds];
+		[*_titleLabel setTextColor:[UIColor whiteColor]];
+		[*_messageLabel setTextColor:[UIColor whiteColor]];
+
 		if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) {
 			[*_titleLabel setHidden:NO];
 			CGSize firstLabelSize = [*_titleLabel sizeThatFits:bounds.size];
-			[*_titleLabel setFrame:(CGRect){ { 24.0f, 0.0f }, { firstLabelSize.width, 21.0f } }];
-			[*_messageLabel setFrame:(CGRect){ { firstLabelSize.width + 28.0f, 1.5f }, { bounds.size.width - firstLabelSize.width - 30.0f, 21.0f } }];
+			[*_titleLabel setFrame:(CGRect){ { width + 4.0f, 0.0f }, { firstLabelSize.width, 19.0f } }];
+			[*_messageLabel setFrame:(CGRect){ { firstLabelSize.width + width + 6.0f, 1.5f }, { bounds.size.width - firstLabelSize.width - width - 6.0f, 19.0f } }];
 		} else {
 			[*_titleLabel setHidden:YES];
-			[*_messageLabel setFrame:(CGRect){ { 24.0f, 1.5f }, { bounds.size.width - 26.0f, 21.0f } }];
+			[*_messageLabel setFrame:(CGRect){ { width + 4.0f, 1.5f }, { bounds.size.width - width - 6.0f, 19.0f } }];
 		}
 		if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
 			[*_messageLabel setMarqueeEnabled:YES];

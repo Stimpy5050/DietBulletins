@@ -2,7 +2,7 @@ TWEAK_NAME = DietBulletin
 DietBulletin_FILES = Tweak.x
 DietBulletin_FRAMEWORKS = UIKit
 
-ADDITIONAL_CFLAGS = -std=c99
+ADDITIONAL_CFLAGS = -std=c99 -I..
 
 TARGET_IPHONEOS_DEPLOYMENT_VERSION := 3.0
 

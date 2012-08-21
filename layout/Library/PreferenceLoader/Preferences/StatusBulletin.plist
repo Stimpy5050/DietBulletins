@@ -3,7 +3,7 @@ entry = {
   cell = PSLinkCell;
   icon = "/Applications/Preferences.app/notifications_icon.png";
   isController = 1;
-  label = DietBulletin;
+  label = StatusBulletin;
   ALSettingsPath = "/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist";
   ALSettingsKeyPrefix = "DBShowTitle-";
   ALChangeNotification = "com.rpetrich.dietbulletin.settingschanged";
@@ -26,7 +26,7 @@ entry = {
   	  "cell-class-name" = "ALSwitchCell";
   	  "icon-size" = 29;
   	  "suppress-hidden-apps" = 1;
-  	  "footer-title" = "© 2012 Ryan Petrich";
+  	  "footer-title" = "© 2012 dba Technologies, LLC\n\nBased on DietBulletin \n© 2012 Ryan Petrich";
   	}
   );
 };
