@@ -1,23 +1,33 @@
+title = StatusBulletin;
 entry = {
-  bundle = AppList;
   cell = PSLinkCell;
   icon = "/Applications/Preferences.app/notifications_icon.png";
-  isController = 1;
   label = StatusBulletin;
+};
+items = (
+{
+	cell = PSGroupCell;
+	footerText = "Smart titles allows StatusBulletin to do it's best to show and hide titles based on the notification type.";
+},
+{
+	cell = PSSwitchCell;
+	label = "Smart Titles";
+	key = "DBSmartTitles";
+	default = false;
+	defaults = "com.rpetrich.dietbulletin";
+},
+{
+  bundle = AppList;
+  cell = PSLinkCell;
+  isController = 1;
+  label = "Custom Titles";
   ALSettingsPath = "/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist";
   ALSettingsKeyPrefix = "DBShowTitle-";
   ALChangeNotification = "com.rpetrich.dietbulletin.settingschanged";
   ALSettingsDefaultValue = 1;
   ALSectionDescriptors = (
     {
-      items = (
-	{
-		cell = PSSwitchCell;
-		label = "Smart Titles";
-		key = "DBSmartTitles";
-		default = false;
-		defaults = "com.rpetrich.dietbulletin";
-	});
+      items = ();
       "footer-title" = "Select which apps show titles in their bulletins";
     },
   	{
@@ -36,4 +46,6 @@ entry = {
   	  "footer-title" = "© 2012 dba Technologies, LLC\n\nBased on DietBulletin \n© 2012 Ryan Petrich";
   	}
   );
+}
+);
 };
