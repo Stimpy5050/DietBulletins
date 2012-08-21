@@ -268,7 +268,8 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 		}
 
 		[*_titleLabel setHidden:YES];
-		[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 1.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
+		[*_messageLabel setFont:[UIFont boldSystemFontOfSize:12]];
+		[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
 
 		if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
 			[*_messageLabel setMarqueeEnabled:YES];
