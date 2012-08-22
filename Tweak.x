@@ -278,22 +278,23 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 		[*_messageLabel setFont:[UIFont boldSystemFontOfSize:12]];
 		[*_titleLabel setFont:[UIFont boldSystemFontOfSize:12]];
 
-		NSLog(@"SBB: %d, %d, %d, %d, %f, %f", [*_messageLabel isHidden], [*_titleLabel isHidden], [*_messageLabel text].length, [*_titleLabel text].length, [*_messageLabel alpha], [*_titleLabel alpha]);
-
-		if ([*_messageLabel isHidden])
+		if (![*_titleLabel isHidden])
 		{
-			// odd case where some other tweak is hiding the message, we just show the title
-			[*_titleLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
+			if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) 
+				[*_messageLabel setText:[NSString stringWithFormat:@"%@: %@", [*_titleLabel text], [*_messageLabel text]]];
+		}
+
+		[*_titleLabel setHidden:YES];
+
+		BOOL isMessageScrolling = [[*_messageLabel superview] isKindOfClass:UIScrollView.class];
+
+		if (isMessageScrolling)
+		{
+			[*_messageLabel sizeToFit];
+			[[*_messageLabel superview] setFrame:(CGRect){ { width + 6.0f, 2.0f }, { bounds.size.width - width - 8.0f, 19.0f } }];
 		}
 		else
 		{
-			if (![*_titleLabel isHidden])
-			{
-				if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) 
-					[*_messageLabel setText:[NSString stringWithFormat:@"%@: %@", [*_titleLabel text], [*_messageLabel text]]];
-			}
-
-			[*_titleLabel setHidden:YES];
 			[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
 
 			if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
