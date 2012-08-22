@@ -143,9 +143,12 @@ static NSTimeInterval dismissInterval(SBBulletinBannerController* ctr, SEL selec
 		SBBannerAndShadowView** _bannerAndShadowView = CHIvarRef(ctr, _bannerAndShadowView, SBBannerAndShadowView*);
 		SBBannerView* banner = [*_bannerAndShadowView banner];
 
+		UILabel** _titleLabel = CHIvarRef(banner, _titleLabel, UILabel*);
 		UILabel** _messageLabel = CHIvarRef(banner, _messageLabel, UILabel*);
-		NSString* text = [*_messageLabel text];
+
+		NSString* text = ([*_messageLabel isHidden] ? [*_titleLabel text] : [*_messageLabel text]);
 		CGSize size = [text sizeWithFont:[*_messageLabel font]];
+
 		float distance = size.width - [*_messageLabel frame].size.width;
 		if (distance > 0)
 			return (distance / 30.0f) + 2.0f;
@@ -272,20 +275,33 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 				break;
 		}
 
-		if (![*_titleLabel isHidden])
-		{
-			if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) 
-				[*_messageLabel setText:[NSString stringWithFormat:@"%@: %@", [*_titleLabel text], [*_messageLabel text]]];
-		}
-
-		[*_titleLabel setHidden:YES];
 		[*_messageLabel setFont:[UIFont boldSystemFontOfSize:12]];
-		[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
+		[*_titleLabel setFont:[UIFont boldSystemFontOfSize:12]];
 
-		if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
-			[*_messageLabel setMarqueeEnabled:YES];
-			[*_messageLabel setMarqueeRunning:YES];
+		NSLog(@"SBB: %d, %d, %d, %d, %f, %f", [*_messageLabel isHidden], [*_titleLabel isHidden], [*_messageLabel text].length, [*_titleLabel text].length, [*_messageLabel alpha], [*_titleLabel alpha]);
+
+		if ([*_messageLabel isHidden])
+		{
+			// odd case where some other tweak is hiding the message, we just show the title
+			[*_titleLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
 		}
+		else
+		{
+			if (![*_titleLabel isHidden])
+			{
+				if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) 
+					[*_messageLabel setText:[NSString stringWithFormat:@"%@: %@", [*_titleLabel text], [*_messageLabel text]]];
+			}
+
+			[*_titleLabel setHidden:YES];
+			[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
+
+			if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
+				[*_messageLabel setMarqueeEnabled:YES];
+				[*_messageLabel setMarqueeRunning:YES];
+			}
+		}
+
 		[*_underlayView setHidden:YES];
 	}
 }
