@@ -202,6 +202,10 @@ static int statusBarStyle()
 		UISwipeGestureRecognizer* gr = [[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeBannerRight)] autorelease];
 		[self addGestureRecognizer:gr];
 
+//		gr = [[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeBannerLeft)] autorelease];
+//		gr.direction = UISwipeGestureRecognizerDirectionLeft;
+//		[self addGestureRecognizer:gr];
+
 		[self setClipsToBounds:YES];
 
 		CALayer* layer = self.layer;
@@ -291,6 +295,17 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
     [UIView animateWithDuration:0.5 animations:^{
         CGRect r = self.window.frame;
         r.origin.x = 2000;
+        self.window.frame = r;
+    } completion:^(BOOL finished) {        
+        [[%c(SBBulletinBannerController) sharedInstance] dismissBanner];
+    }];
+}
+
+%new -(void) swipeBannerLeft
+{
+    [UIView animateWithDuration:0.5 animations:^{
+        CGRect r = self.window.frame;
+        r.origin.x = -2000;
         self.window.frame = r;
     } completion:^(BOOL finished) {        
         [[%c(SBBulletinBannerController) sharedInstance] dismissBanner];
