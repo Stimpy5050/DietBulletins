@@ -252,6 +252,13 @@ static int statusBarStyle()
 	return nil;
 }
 
+static BOOL DBShouldHideBiteSMSButton()
+{
+	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist"];
+	NSNumber* bite = [settings objectForKey:@"DBHideBiteSMSButton"];
+	return bite.boolValue;
+}
+
 static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 {
 	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist"];
@@ -298,6 +305,11 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 		[*_messageLabel setFont:[UIFont boldSystemFontOfSize:12]];
 		[*_titleLabel setFont:[UIFont boldSystemFontOfSize:12]];
 
+		// handle biteSMS button
+		UIView* b = [self viewWithTag:844610];
+		b.hidden = DBShouldHideBiteSMSButton();
+		NSLog(@"SBB: Button: %@, %d, %d", b, b.contentMode, b.contentStretch);
+
 		if (![*_titleLabel isHidden])
 		{
 			if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) 
@@ -312,11 +324,11 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 		if (isMessageScrolling)
 		{
 			[*_messageLabel sizeToFit];
-			[[*_messageLabel superview] setFrame:(CGRect){ { width + 6.0f, 2.0f }, { bounds.size.width - width - 8.0f, 19.0f } }];
+			[[*_messageLabel superview] setFrame:(CGRect){ { width + 6.0f, 2.0f }, { bounds.size.width - width - 8.0f - (!b.hidden ? 40 : 0), 19.0f } }];
 		}
 		else
 		{
-			[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f, 19.0f } }];
+			[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f - (!b.hidden ? 40 : 0), 19.0f } }];
 
 			if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
 				[*_messageLabel setMarqueeEnabled:YES];

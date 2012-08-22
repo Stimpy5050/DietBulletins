@@ -7,7 +7,7 @@ entry = {
 items = (
 {
 	cell = PSGroupCell;
-	footerText = "Smart titles allows StatusBulletin to do it's best to show and hide titles based on the notification type.\n\n© 2012 dba Technologies, LLC\n\nBased on DietBulletin \n© 2012 Ryan Petrich";
+	footerText = "Smart titles allows StatusBulletin to do it's best to show and hide titles based on the notification type.";
 },
 {
 	cell = PSSwitchCell;
@@ -45,6 +45,17 @@ items = (
   	  "suppress-hidden-apps" = 1;
   	}
   );
+},
+{
+	cell = PSGroupCell;
+	footerText = "© 2012 dba Technologies, LLC\n\nBased on DietBulletin \n© 2012 Ryan Petrich";
+},
+{
+	cell = PSSwitchCell;
+	label = "Hide BiteSMS Button";
+	key = "DBHideBiteSMSButton";
+	default = false;
+	defaults = "com.rpetrich.dietbulletin";
 }
 );
 };
