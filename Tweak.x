@@ -131,9 +131,30 @@
 - (void)setMarqueeRunning:(BOOL)marqueeRunning;
 @end
 
+// Thanks to NCPad for this code!
+#define SBBWidthForOrient(orient) (UIDeviceOrientationIsLandscape(orient)||UIInterfaceOrientationIsLandscape(orient)?[[UIScreen mainScreen]bounds].size.height:[[UIScreen mainScreen]bounds].size.width)
+
 %config(generator=internal);
 
 %hook SBBulletinBannerController
+
+-(CGRect)_normalBannerFrameForOrientation:(int)orientation
+{
+	CGRect frame = %orig;
+	frame.origin.x = 0;
+	frame.size.width = SBBWidthForOrient(orientation);
+	frame.size.height = 20.0f;
+	return frame;
+}
+
+-(CGRect)_currentBannerFrameForOrientation:(int)orientation
+{
+	CGRect frame = %orig;
+	frame.origin.x = 0;
+	frame.size.width = SBBWidthForOrient(orientation);
+	frame.size.height = 20.0f;
+	return frame;
+}
 
 static NSTimeInterval dismissInterval(SBBulletinBannerController* ctr, SEL selector, NSTimeInterval delay)
 {
@@ -163,31 +184,30 @@ static NSTimeInterval dismissInterval(SBBulletinBannerController* ctr, SEL selec
 	%orig;
 }
 
-- (CGRect)_currentBannerFrameForOrientation:(int)orientation
-{
-	CGRect result = %orig();
-	result.size.height -= 20.0f;
-	return result;
-}
-
 %end
 
+/*
 %hook SBBannerAndShadowView
 
 - (void)setBannerFrame:(CGRect)frame
 {
+	frame.origin.x = 0.0f;
 	frame.size.height = 20.0f;
+	frame.size.width = [UIScreen mainScreen].bounds.size.width;
 	%orig();
 }
 
 - (CGRect)_frameForBannerFrame:(CGRect)bannerFrame
 {
 	CGRect result = %orig();
+	result.origin.x = 0.0f;
 	result.size.height -= 20.0f;
+	result.size.width = [UIScreen mainScreen].bounds.size.width;
 	return result;
 }
 
 %end
+*/
 
 static int statusBarStyle()
 {
