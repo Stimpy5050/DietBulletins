@@ -7,7 +7,7 @@ entry = {
 items = (
 {
 	cell = PSGroupCell;
-	footerText = "Smart titles allows StatusBulletin to do it's best to show and hide titles based on the notification type.";
+	footerText = "Smart titles allows StatusBulletin to do it's best to show and hide titles based on the notification type.\n\n© 2012 dba Technologies, LLC\n\nBased on DietBulletin \n© 2012 Ryan Petrich";
 },
 {
 	cell = PSSwitchCell;
@@ -20,7 +20,7 @@ items = (
   bundle = AppList;
   cell = PSLinkCell;
   isController = 1;
-  label = "Custom Titles";
+  label = "Custom Title Settings";
   ALSettingsPath = "/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist";
   ALSettingsKeyPrefix = "DBShowTitle-";
   ALChangeNotification = "com.rpetrich.dietbulletin.settingschanged";
@@ -28,7 +28,7 @@ items = (
   ALSectionDescriptors = (
     {
       items = ();
-      "footer-title" = "Select which apps show titles in their bulletins";
+      "footer-title" = "Select which apps show titles in their bulletins.  These settings are ignored when Smart Titles are enabled.";
     },
   	{
   	  title = "System Applications";
@@ -43,7 +43,6 @@ items = (
   	  "cell-class-name" = "ALSwitchCell";
   	  "icon-size" = 29;
   	  "suppress-hidden-apps" = 1;
-  	  "footer-title" = "© 2012 dba Technologies, LLC\n\nBased on DietBulletin \n© 2012 Ryan Petrich";
   	}
   );
 }
