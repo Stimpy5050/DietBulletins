@@ -286,6 +286,7 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 
 		[*_titleLabel setHidden:YES];
 
+		// Fix for Reveal - since Reveal puts the messageLabel in a scrollview, this catches that case.
 		BOOL isMessageScrolling = [[*_messageLabel superview] isKindOfClass:UIScrollView.class];
 
 		if (isMessageScrolling)
