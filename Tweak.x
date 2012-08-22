@@ -120,6 +120,10 @@
 @end
 
 @interface SBBulletinBannerController : NSObject
+
++(SBBulletinBannerController*) sharedInstance;
+-(void) dismissBanner;
+
 @end
 
 @interface UILabel (Marquee)
@@ -195,6 +199,9 @@ static int statusBarStyle()
 {
 	if ((self = %orig())) 
 	{
+		UISwipeGestureRecognizer* gr = [[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeBannerRight)] autorelease];
+		[self addGestureRecognizer:gr];
+
 		[self setClipsToBounds:YES];
 
 		CALayer* layer = self.layer;
@@ -277,6 +284,17 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 		}
 		[*_underlayView setHidden:YES];
 	}
+}
+
+%new -(void) swipeBannerRight
+{
+    [UIView animateWithDuration:0.5 animations:^{
+        CGRect r = self.window.frame;
+        r.origin.x = 2000;
+        self.window.frame = r;
+    } completion:^(BOOL finished) {        
+        [[%c(SBBulletinBannerController) sharedInstance] dismissBanner];
+    }];
 }
 
 %end
