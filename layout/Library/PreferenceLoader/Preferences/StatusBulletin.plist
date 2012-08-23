@@ -51,6 +51,16 @@ items = (
 	footerText = "© 2012 dba Technologies, LLC\n\nBased on DietBulletin \n© 2012 Ryan Petrich";
 },
 {
+	cell = PSLinkListCell;
+	label = "Banner Style";
+	detail = PSListItemsController;
+	key = "DBBannerStyle";
+	default = 0;
+	defaults = "com.rpetrich.dietbulletin";
+	validTitles = ("Matching", "Inverted", "Black", "Silver");
+	validValues = (0, 1, 2, 3);
+},
+{
 	cell = PSSwitchCell;
 	label = "Hide BiteSMS Button";
 	key = "DBHideBiteSMSButton";

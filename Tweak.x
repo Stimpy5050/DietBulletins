@@ -209,14 +209,59 @@ static NSTimeInterval dismissInterval(SBBulletinBannerController* ctr, SEL selec
 %end
 */
 
+%hook SBBannerView
+
+- (UIImage *)_bannerImageWithAttachmentImage:(UIImage *)attachmentImage
+{
+	return nil;
+}
+
+static BOOL DBShouldHideBiteSMSButton()
+{
+	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist"];
+	NSNumber* bite = [settings objectForKey:@"DBHideBiteSMSButton"];
+	return bite.boolValue;
+}
+
+static int DBBannerStyle()
+{
+	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist"];
+	NSNumber* style = [settings objectForKey:@"DBBannerStyle"];
+	return style.intValue;
+}
+
+static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
+{
+	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist"];
+
+	id smart = [settings objectForKey:@"DBSmartTitles"];
+	if ([smart boolValue])
+	{
+		return ([displayIdentifier rangeOfString:@"com.apple."].location == 0);
+	}
+
+	NSString *key = [NSString stringWithFormat:@"DBShowTitle-%@", displayIdentifier];
+	id value = [settings objectForKey:key];
+	return !value || [value boolValue];
+}
+
 static int statusBarStyle()
 {
 	SpringBoard* sb = (SpringBoard*)[UIApplication sharedApplication];
 	SBApplication* app = [sb _accessibilityFrontMostApplication];
-	return (app ? app.statusBarStyle : sb.statusBarStyle);
-}
+	int sbStyle = (app ? app.statusBarStyle : sb.statusBarStyle);
+	switch (DBBannerStyle())
+	{
+		case 1: 
+			return (sbStyle == 0 ? 2 : 0);
+		case 2:
+			return 2;
+		case 3:
+			return 0;
+	}
 
-%hook SBBannerView
+	return sbStyle;
+}
 
 - (SBBannerView*)initWithItem:(id)item
 {
@@ -247,32 +292,6 @@ static int statusBarStyle()
 	return self;
 }
 
-- (UIImage *)_bannerImageWithAttachmentImage:(UIImage *)attachmentImage
-{
-	return nil;
-}
-
-static BOOL DBShouldHideBiteSMSButton()
-{
-	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist"];
-	NSNumber* bite = [settings objectForKey:@"DBHideBiteSMSButton"];
-	return bite.boolValue;
-}
-
-static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
-{
-	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.rpetrich.dietbulletin.plist"];
-
-	id smart = [settings objectForKey:@"DBSmartTitles"];
-	if ([smart boolValue])
-	{
-		return ([displayIdentifier rangeOfString:@"com.apple."].location == 0);
-	}
-
-	NSString *key = [NSString stringWithFormat:@"DBShowTitle-%@", displayIdentifier];
-	id value = [settings objectForKey:key];
-	return !value || [value boolValue];
-}
 
 - (void)layoutSubviews
 {
@@ -324,11 +343,11 @@ static BOOL DBShouldShowTitleForDisplayIdentifier(NSString *displayIdentifier)
 		if (isMessageScrolling)
 		{
 			[*_messageLabel sizeToFit];
-			[[*_messageLabel superview] setFrame:(CGRect){ { width + 6.0f, 2.0f }, { bounds.size.width - width - 8.0f - (!b.hidden ? 40 : 0), 19.0f } }];
+			[[*_messageLabel superview] setFrame:(CGRect){ { width + 6.0f, 2.0f }, { bounds.size.width - width - 8.0f - (b != nil && !b.hidden ? 40 : 0), 19.0f } }];
 		}
 		else
 		{
-			[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f - (!b.hidden ? 40 : 0), 19.0f } }];
+			[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f - (b != nil && !b.hidden ? 40 : 0), 19.0f } }];
 
 			if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
 				[*_messageLabel setMarqueeEnabled:YES];
