@@ -361,9 +361,9 @@ static int statusBarStyle()
 %new -(void) swipeBannerRight
 {
     [UIView animateWithDuration:0.5 animations:^{
-        CGRect r = self.window.frame;
+        CGRect r = self.frame;
         r.origin.x = 2000;
-        self.window.frame = r;
+        self.frame = r;
     } completion:^(BOOL finished) {        
         [[%c(SBBulletinBannerController) sharedInstance] dismissBanner];
     }];
@@ -372,9 +372,9 @@ static int statusBarStyle()
 %new -(void) swipeBannerLeft
 {
     [UIView animateWithDuration:0.5 animations:^{
-        CGRect r = self.window.frame;
+        CGRect r = self.frame;
         r.origin.x = -2000;
-        self.window.frame = r;
+        self.frame = r;
     } completion:^(BOOL finished) {        
         [[%c(SBBulletinBannerController) sharedInstance] dismissBanner];
     }];
