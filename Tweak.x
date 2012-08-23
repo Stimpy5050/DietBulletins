@@ -327,7 +327,6 @@ static int statusBarStyle()
 		// handle biteSMS button
 		UIView* b = [self viewWithTag:844610];
 		b.hidden = DBShouldHideBiteSMSButton();
-		NSLog(@"SBB: Button: %@, %d, %d", b, b.contentMode, b.contentStretch);
 
 		if (![*_titleLabel isHidden])
 		{
