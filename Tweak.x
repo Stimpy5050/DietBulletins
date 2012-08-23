@@ -172,7 +172,7 @@ static NSTimeInterval dismissInterval(SBBulletinBannerController* ctr, SEL selec
 
 		float distance = size.width - [*_messageLabel frame].size.width;
 		if (distance > 0)
-			return (distance / 30.0f) + 2.0f;
+			return MAX(6.5f, (distance / 30.0f) + 2.0f);
 	}
 
 	return delay;
@@ -328,33 +328,56 @@ static int statusBarStyle()
 		UIView* b = [self viewWithTag:844610];
 		b.hidden = DBShouldHideBiteSMSButton();
 
-		if (![*_titleLabel isHidden])
+		if (*_messageLabel == nil)
 		{
-			if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) 
-				[*_messageLabel setText:[NSString stringWithFormat:@"%@: %@", [*_titleLabel text], [*_messageLabel text]]];
-		}
-
-		[*_titleLabel setHidden:YES];
-
-		// Fix for Reveal - since Reveal puts the messageLabel in a scrollview, this catches that case.
-		BOOL isMessageScrolling = [[*_messageLabel superview] isKindOfClass:UIScrollView.class];
-
-		if (isMessageScrolling)
-		{
-			[*_messageLabel sizeToFit];
-			[[*_messageLabel superview] setFrame:(CGRect){ { width + 6.0f, 2.0f }, { bounds.size.width - width - 8.0f - (b != nil && !b.hidden ? 40 : 0), 19.0f } }];
+			[*_titleLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f - (b != nil && !b.hidden ? 40 : 0), 19.0f } }];
 		}
 		else
 		{
-			[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f - (b != nil && !b.hidden ? 40 : 0), 19.0f } }];
-
-			if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
-				[*_messageLabel setMarqueeEnabled:YES];
-				[*_messageLabel setMarqueeRunning:YES];
+			if (![*_titleLabel isHidden])
+			{
+				if (DBShouldShowTitleForDisplayIdentifier(self.item.seedBulletin.sectionID)) 
+				{
+					NSString* title = [*_titleLabel text];
+					NSString* message = [*_messageLabel text];
+				
+					NSMutableString* str = [NSMutableString stringWithCapacity:10];
+					if (title.length > 0)
+					{
+						[str appendString:title];
+						if (message.length > 0)
+							[str appendString:@": "];
+					}
+	
+					if (message.length > 0)
+						[str appendString:message];
+					
+					[*_messageLabel setText:str];
+				}
 			}
+	
+			[*_titleLabel setHidden:YES];
+	
+			// Fix for Reveal - since Reveal puts the messageLabel in a scrollview, this catches that case.
+			BOOL isMessageScrolling = [[*_messageLabel superview] isKindOfClass:UIScrollView.class];
+	
+			if (isMessageScrolling)
+			{
+				[*_messageLabel sizeToFit];
+				[[*_messageLabel superview] setFrame:(CGRect){ { width + 6.0f, 2.0f }, { bounds.size.width - width - 8.0f - (b != nil && !b.hidden ? 40 : 0), 19.0f } }];
+			}
+			else
+			{
+				[*_messageLabel setFrame:(CGRect){ { width + 6.0f, 0.5f }, { bounds.size.width - width - 8.0f - (b != nil && !b.hidden ? 40 : 0), 19.0f } }];
+	
+				if ([UILabel instancesRespondToSelector:@selector(setMarqueeEnabled:)] && [UILabel instancesRespondToSelector:@selector(setMarqueeRunning:)]) {
+					[*_messageLabel setMarqueeEnabled:YES];
+					[*_messageLabel setMarqueeRunning:YES];
+				}
+			}
+	
+			[*_underlayView setHidden:YES];
 		}
-
-		[*_underlayView setHidden:YES];
 	}
 }
 
